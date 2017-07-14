@@ -1,5 +1,5 @@
 <%@ Page Language="C#" AutoEventWireup="true" MasterPageFile="../masterpages/umbracoPage.Master" CodeBehind="PermissionEditor.aspx.cs" Inherits="umbraco.cms.presentation.user.PermissionEditor" %>
-
+<%@ Import Namespace="Umbraco.Web" %>
 <%@ Register Src="../controls/Tree/TreeControl.ascx" TagName="TreeControl" TagPrefix="umbraco" %>
 <%@ Register Src="NodePermissions.ascx" TagName="NodePermissions" TagPrefix="user" %>
 <%@ Register TagPrefix="ui" Namespace="umbraco.uicontrols" Assembly="controls" %>
@@ -9,7 +9,6 @@
 	<umb:CssInclude ID="CssInclude2" runat="server" FilePath="css/permissionsEditor.css" PathNameAlias="UmbracoRoot" />
 	<umb:CssInclude ID="CssInclude1" runat="server" FilePath="css/umbracoGui.css" PathNameAlias="UmbracoRoot" />
 	<umb:JsInclude ID="JsInclude1"  runat="server" FilePath="PermissionsEditor.js" />
-	<umb:JsInclude ID="JsInclude2"  runat="server" FilePath="../lib/jquery-migrate/jquery-migrate.min.js" />	
 	
 </asp:Content>
 <asp:Content ContentPlaceHolderID="body" runat="server">
@@ -28,7 +27,7 @@
 			<script type="text/javascript" language="javascript">				
 				jQuery(document).ready(function() {
 					jQuery("#<%=JTree.ClientID%>").PermissionsEditor({
-						userId: <%=Request.QueryString["id"] %>,
+						userId: <%=Request.CleanForXss("id") %>,
 						pPanelSelector: "#permissionsPanel",
 						replacePChkBoxSelector: "#chkChildPermissions"});						
 				});

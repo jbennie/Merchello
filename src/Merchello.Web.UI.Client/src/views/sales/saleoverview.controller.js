@@ -145,7 +145,6 @@
 
                     loadShippingAddress(id);
 
-
                     $scope.showFulfill = hasUnPackagedLineItems();
                     $scope.loaded = true;
 
@@ -316,9 +315,8 @@
                     // added a timeout here to give the examine index
                     $timeout(function() {
                         notificationsService.success("Payment Captured");
-                        console.info(paymentRequest);
                         loadInvoice(paymentRequest.invoiceKey);
-                    }, 400);
+                    }, 800);
                 }, function (reason) {
                     notificationsService.error("Payment Capture Failed", reason.message);
                 });
@@ -353,7 +351,7 @@
                 var promiseStatuses = shipmentResource.getAllShipmentStatuses();
                 promiseStatuses.then(function(statuses) {
                     var data = dialogDataFactory.createCreateShipmentDialogData();
-                    data.order = $scope.invoice.orders[0]; // todo: pull from current order when multiple orders is available
+                    data.order = $scope.invoice.orders[0];
                     data.order.items = data.order.getUnShippedItems();
                     data.shipmentStatuses = statuses;
                     data.currencySymbol = $scope.currencySymbol;
@@ -367,7 +365,8 @@
 
                     // TODO this could eventually turn into an array
                     var shipmentLineItems = $scope.invoice.getShippingLineItems();
-                    if (shipmentLineItems[0]) {
+                    data.shipmentLineItems = shipmentLineItems;
+                    if (shipmentLineItems.length) {
                         var shipMethodKey = shipmentLineItems[0].extendedData.getValue('merchShipMethodKey');
                         var request = { shipMethodKey: shipMethodKey, invoiceKey: data.invoiceKey, lineItemKey: shipmentLineItems[0].key };
                         var shipMethodPromise = shipmentResource.getShipMethodAndAlternatives(request);
@@ -376,6 +375,7 @@
                             data.shipMethods.selected = _.find(data.shipMethods.alternatives, function(method) {
                                 return method.key === shipMethodKey;
                             });
+
                             dialogService.open({
                                 template: '/App_Plugins/Merchello/Backoffice/Merchello/Dialogs/sales.create.shipment.html',
                                 show: true,
@@ -419,8 +419,9 @@
                     promiseNewShipment.then(function (shipment) {
                         $timeout(function() {
                             notificationsService.success('Shipment #' + shipment.shipmentNumber + ' created');
+                            //console.info(shipment);
                             loadInvoice(data.invoiceKey);
-                        }, 400);
+                        }, 800);
 
                     }, function (reason) {
                         notificationsService.error("New Shipment Failed", reason.message);
@@ -494,9 +495,9 @@
                 }
 
                 if (address.addressType === 'Billing') {
-                    dialogData.warning = 'Note: This ONLY changes the addresses associated with THIS invoice.';
+                    dialogData.warning = localizationService.localize('merchelloSales_noteInvoiceAddressChange');
                 } else {
-                    dialogData.warning = 'Note: This will not change any existing shipment destination addresses.'
+                    dialogData.warning = localizationService.localize('merchelloSales_noteShipmentAddressChange');
                 }
 
 

@@ -790,8 +790,8 @@ angular.module('merchello.resources')
      **/
     angular.module('merchello.resources')
         .factory('invoiceResource', [
-            '$q', '$http', 'umbRequestHelper',
-            function($q, $http, umbRequestHelper) {
+            '$q', '$http', 'umbRequestHelper', 'invoiceItemItemizationDisplayBuilder',
+            function($q, $http, umbRequestHelper, invoiceItemItemizationDisplayBuilder) {
 
                 var baseUrl = Umbraco.Sys.ServerVariables['merchelloUrls']['merchelloInvoiceApiBaseUrl'];
 
@@ -811,6 +811,31 @@ angular.module('merchello.resources')
                                 params: { id: id }
                             }),
                             'Failed to retreive data for invoice id: ' + id);
+                    },
+
+                    /**
+                     * @ngdoc method
+                     * @name getItemItemization
+                     * @description
+                     **/
+                    getItemItemization: function (id) {
+                        var url = baseUrl + 'GetInvoiceItemItemization';
+
+                        var deferred = $q.defer();
+                        $q.all([
+                            umbRequestHelper.resourcePromise(
+                                $http({
+                                    url: url,
+                                    method: "GET",
+                                    params: { id: id }
+                                }),
+                                'Failed to retreive data for invoice itemization for id: ' + id)
+                        ]).then(function(data) {
+                            var results = invoiceItemItemizationDisplayBuilder.transform(data[0]);
+                            deferred.resolve(results);
+                        });
+
+                        return deferred.promise;
                     },
 
                     /**
@@ -1740,7 +1765,28 @@ angular.module('merchello.resources').factory('noteResource', [
                             query
                         ),
                         'Failed to search products');
+                },
+
+                advancedSearchProducts: function(query) {
+                    var url = Umbraco.Sys.ServerVariables['merchelloUrls']['merchelloProductApiBaseUrl'] + 'GetByAdvancedSearch';
+                    return umbRequestHelper.resourcePromise(
+                        $http.post(
+                            url,
+                            query
+                        ),
+                        'Failed to advanced search products');
+                },
+
+                getRecentlyUpdated: function(query) {
+                    var url = Umbraco.Sys.ServerVariables['merchelloUrls']['merchelloProductApiBaseUrl'] + 'GetRecentlyUpdated';
+                    return umbRequestHelper.resourcePromise(
+                        $http.post(
+                            url,
+                            query
+                        ),
+                        'Failed to get recently updated products');
                 }
+
             };
     }]);
 
@@ -1926,8 +1972,8 @@ angular.module('merchello.resources').factory('productOptionResource',
 
         }]);
 angular.module('merchello.resources').factory('salesByItemResource',
-    ['$http', '$q', 'umbRequestHelper', 'queryResultDisplayBuilder', 'salesByItemResultBuilder',
-    function($http, $q, umbRequestHelper, queryResultDisplayBuilder, salesByItemResultBuilder) {
+    ['$http', '$q', 'umbRequestHelper', 'queryDisplayBuilder', 'queryResultDisplayBuilder', 'salesByItemResultBuilder',
+    function($http, $q, umbRequestHelper, queryDisplayBuilder, queryResultDisplayBuilder, salesByItemResultBuilder) {
 
         var baseUrl = Umbraco.Sys.ServerVariables['merchelloUrls']['merchelloSalesByItemApiBaseUrl'];
 
@@ -2268,6 +2314,10 @@ angular.module('merchello.resources').factory('salesOverTimeResource',
              */
             getTypeFields: function () {
                 return getCachedOrApi("AllTypeFields", "GetTypeFields", "settings");
+            },
+
+            getReportBackofficeTrees: function() {
+                return getCachedOrApi("pluginReports", "GetReportBackofficeTrees", "BackofficeTree");
             }
 
         };

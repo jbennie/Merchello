@@ -31,7 +31,7 @@ angular.module('merchello').controller('Merchello.Directives.ProductVariantsView
         $scope.toggleAvailable = toggleAvailable;
         $scope.redirectToEditor = redirectToEditor;
         $scope.getVariantAttributeForOption = getVariantAttributeForOption;
-
+        $scope.regenSkus = regenSkus;
 
         $scope.toggleChecks = function() {
             if ($scope.checkAll === true) {
@@ -246,6 +246,16 @@ angular.module('merchello').controller('Merchello.Directives.ProductVariantsView
         // Dialog Event Handlers
         //--------------------------------------------------------------------------------------
 
+        function regenSkus() {
+            var dialogData = { name: $scope.product.name }
+            dialogService.open({
+                template: '/App_Plugins/Merchello/Backoffice/Merchello/Dialogs/productvariant.bulk.skuupdate.html',
+                show: true,
+                callback: regenSkusConfirm,
+                dialogData: dialogData
+            });
+        }
+
         /**
          * @ngdoc method
          * @name changePrices
@@ -258,7 +268,8 @@ angular.module('merchello').controller('Merchello.Directives.ProductVariantsView
             var dialogData = dialogDataFactory.createBulkVariantChangePricesDialogData();
             dialogData.productVariants = $scope.selectedVariants();
             dialogData.price = _.min(dialogData.productVariants, function(v) { return v.price;}).price;
-            dialogData.salePrice = _.min(dialogData.productVariants, function(v) { return v.salePrice; }).price;
+            dialogData.salePrice = _.min(dialogData.productVariants, function (v) { return v.salePrice; }).price;
+            dialogData.costOfGoods = _.min(dialogData.productVariants, function (v) { return v.costOfGoods; }).costOfGoods;
             dialogData.currencySymbol = $scope.currencySymbol;
             dialogService.open({
                 template: '/App_Plugins/Merchello/Backoffice/Merchello/Dialogs/productvariant.bulk.changeprice.html',
@@ -331,14 +342,22 @@ angular.module('merchello').controller('Merchello.Directives.ProductVariantsView
          * Handles the new price passed back from the dialog and sets the variants price and saves them.
          */
         function changePricesDialogConfirm(dialogData) {
-            angular.forEach(dialogData.productVariants, function(pv) {
-                pv.price = dialogData.price;
-                if(dialogData.includeSalePrice) {
-                    pv.salePrice = dialogData.salePrice;
-                }
-                productResource.saveVariant(pv);
-            })
+            angular.forEach(dialogData.productVariants,
+                function(pv) {
+                    pv.price = dialogData.price;
+                    if (dialogData.includeCostOfGoods) {
+                        pv.costOfGoods = dialogData.costOfGoods;
+                    }
+                    if (dialogData.includeSalePrice) {
+                        pv.salePrice = dialogData.salePrice;
+                    }
+                    productResource.saveVariant(pv);
+                });
             notificationsService.success("Updated prices");
+        }
+
+        function regenSkusConfirm() {
+            console.info('Got here');
         }
 
         function assertActiveShippingCatalog() {

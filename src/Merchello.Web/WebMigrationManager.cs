@@ -29,14 +29,14 @@
     internal class WebMigrationManager : CoreMigrationManager
     {
         /// <summary>
-        /// The post URL.
+        /// The post URL
         /// </summary>
-        private const string PostUrl = "http://instance.merchello.com/api/migration/Post";
+        private const string PostUrl = "https://instance.merchello.com/api/migration/Post";
 
         /// <summary>
-        /// The record domain URL.
+        /// The record domain URL
         /// </summary>
-        private const string RecordDomainUrl = "http://instance.merchello.com/api/migration/RecordDomain";
+        private const string RecordDomainUrl = "https://instance.merchello.com/api/migration/RecordDomain";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WebMigrationManager"/> class.
@@ -96,7 +96,7 @@
             {
                 var storeSettingService = MerchelloContext.Current.Services.StoreSettingService;
 
-                var setting = storeSettingService.GetByKey(Constants.StoreSettingKeys.HasDomainRecordKey);
+                var setting = storeSettingService.GetByKey(Constants.StoreSetting.HasDomainRecordKey);
                 if (setting != null)
                 {
                     setting.Value = false.ToString();

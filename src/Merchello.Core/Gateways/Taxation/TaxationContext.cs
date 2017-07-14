@@ -88,7 +88,7 @@
         /// <summary>
         /// Gets the product pricing tax method.
         /// </summary>
-        internal ITaxationByProductMethod ProductPricingTaxMethod
+        public ITaxationByProductMethod ProductPricingTaxMethod
         {
             get
             {
@@ -275,7 +275,7 @@
         /// </summary>
         private void SetTaxApplicationSetting()
         {
-            var setting = _storeSettingService.GetByKey(Core.Constants.StoreSettingKeys.GlobalTaxationApplicationKey);
+            var setting = _storeSettingService.GetByKey(Core.Constants.StoreSetting.GlobalTaxationApplicationKey);
             if (setting == null)
             {
                 TaxationApplication = TaxationApplication.Invoice;
