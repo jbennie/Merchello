@@ -25,3 +25,4 @@ npm install xyz (whatever the dependency name is)
 
 ###Run Bazaar solution 
 The build process above places the files in the /App_Plugins directory in the Bazaar project in the source tree. Test the client-side files you just built by opening and running the Bazaar solution. 
+exidir
